@@ -1,0 +1,51 @@
+.container {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, 80px) scale(0.95);
+  width: 100%;
+  max-width: 1400px;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease-in-out, transform 1s ease-in-out,
+    visibility 1s;
+  padding-bottom: 80px; /* Пространство снизу */
+}
+
+.visible {
+  transform: translate(-50%, 0) scale(1);
+  opacity: 1;
+  visibility: visible;
+}
+
+.title {
+  font-size: 60px;
+  margin: 0;
+  position: relative; /* Для позиционирования ::before */
+}
+
+.title::before {
+  content: 'HR';
+  position: absolute;
+  top: 1px;
+  right: 580px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  background-color: #e31e24;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+}
+
+.subtitle {
+  font-weight: bold;
+  font-size: 30px;
+  color: #999999;
+  display: block;
+}

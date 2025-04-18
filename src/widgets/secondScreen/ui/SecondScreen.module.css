@@ -1,0 +1,185 @@
+.wrapper {
+  width: 100%;
+  height: 100vh;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  width: 90%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+}
+
+.textWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 50%;
+}
+
+.title {
+  font-size: 60px;
+  color: #fff;
+  opacity: 0; /* Начальное состояние */
+  transform: translateY(50px); /* Смещение вниз */
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.text {
+  font-size: 20px;
+  color: #e3e3e3;
+  opacity: 0; /* Начальное состояние */
+  transform: translateY(50px); /* Смещение вниз */
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.wrapper.animate .title {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0s; /* Заголовок появляется сразу */
+}
+
+.wrapper.animate .text {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.3s; /* Описание появляется с задержкой 0.3s */
+}
+
+.imageContainer {
+  display: grid;
+  grid-template-columns: repeat(
+    2,
+    320px
+  ); /* 2 колонки шириной 320px */
+  grid-template-rows: repeat(3, 200px); /* 3 строки высотой 200px */
+  gap: 20px; /* Отступы между ячейками */
+  width: 50%;
+}
+
+.image1,
+.image2,
+.image3,
+.image4 {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 20px;
+  box-shadow: 0px -1px 13px 6px rgba(34, 60, 80, 0.2);
+  opacity: 0; /* Начальное состояние */
+  transform: scale(0.8); /* Начальное уменьшение */
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+.wrapper.animate .image1 {
+  opacity: 1;
+  transform: scale(1);
+  transition-delay: 0.6s; /* После текста */
+}
+
+.wrapper.animate .image2 {
+  opacity: 1;
+  transform: scale(1);
+  transition-delay: 0.8s; /* Задержка 0.2s после image1 */
+}
+
+.wrapper.animate .image3 {
+  opacity: 1;
+  transform: scale(1);
+  transition-delay: 1s; /* Задержка 0.2s после image2 */
+}
+
+.wrapper.animate .image4 {
+  opacity: 1;
+  transform: scale(1);
+  transition-delay: 1.2s; /* Задержка 0.2s после image3 */
+}
+
+.image1 {
+  grid-row: span 2; /* Растягивается на 2 строки */
+  grid-column: 1;
+}
+
+.image2 {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.image3 {
+  grid-column: 1;
+  grid-row: 3;
+}
+
+.image4 {
+  grid-row: 2 / 4; /* Растягивается на строки 2 и 3 */
+  grid-column: 2;
+}
+
+/* Адаптивность для маленьких экранов */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .textWrapper {
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .imageContainer {
+    width: 100%;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 120px);
+    gap: 10px;
+  }
+
+  .image1 {
+    grid-row: span 2;
+    grid-column: 1;
+  }
+
+  .image2 {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .image3 {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  .image4 {
+    grid-row: 2 / 4;
+    grid-column: 2;
+  }
+
+  .wrapper.animate .title {
+    transition-delay: 0s;
+  }
+
+  .wrapper.animate .text {
+    transition-delay: 0.2s; /* Уменьшена задержка для мобильных */
+  }
+
+  .wrapper.animate .image1 {
+    transition-delay: 0.4s;
+  }
+
+  .wrapper.animate .image2 {
+    transition-delay: 0.6s;
+  }
+
+  .wrapper.animate .image3 {
+    transition-delay: 0.8s;
+  }
+
+  .wrapper.animate .image4 {
+    transition-delay: 1s;
+  }
+}
