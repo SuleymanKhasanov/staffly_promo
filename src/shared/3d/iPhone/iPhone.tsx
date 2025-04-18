@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { useGLTF } from '@react-three/drei';
-import React, { useEffect, forwardRef } from 'react';
+import { useEffect, forwardRef } from 'react';
 import { GLTF } from 'three-stdlib';
 
 type GLTFResult = GLTF & {
