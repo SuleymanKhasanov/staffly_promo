@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { IPhone } from '../../../shared/3d/iPhone/iPhone';
+import { Pixel } from '../../../shared/3d/Pixel/Pixel';
 import styles from './ThirdScreen.module.css';
 import { useScrollStore } from '../../../shared/store/useScrollStore';
 
@@ -15,59 +16,63 @@ const ThirdScreen = () => {
   const [isSectionReady, setIsSectionReady] = useState(false);
   const [isAnimationComplete, setIsAnimationCompleteState] =
     useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [textIndex, setTextIndex] = useState(0);
 
-  // Сброс состояния при входе в третью секцию
   useEffect(() => {
     if (section === 'third') {
-      // Сбрасываем прогресс скролла для третьей секции
       setThirdSectionProgress(0);
       setAnimationComplete(false);
-      // Задержка для обеспечения готовности секции
-      // Настрой это значение (100 мс), если секция загружается слишком быстро/медленно
+      console.log(
+        'ThirdScreen: Entering third section, resetting progress',
+      );
       const timer = setTimeout(() => {
         console.log(
           'ThirdScreen: Section ready, thirdSectionProgress:',
           thirdSectionProgress,
         );
         setIsSectionReady(true);
-      }, 100);
+      }, 200);
       return () => clearTimeout(timer);
     } else {
       setIsSectionReady(false);
+      setIsAnimationCompleteState(false);
+      setActiveIndex(0);
+      setTextIndex(0);
+      console.log('ThirdScreen: Exiting third section');
     }
   }, [section, setThirdSectionProgress, setAnimationComplete]);
 
-  // Управление анимациями списка и скриншотов
+  const animationStart = 100;
+  const animationThreshold = 800;
+
   useEffect(() => {
     if (!isSectionReady) return;
 
-    // Порог для завершения анимаций списка
-    // Измени 800, чтобы растянуть или сократить диапазон анимаций (должно совпадать с BaseLayout)
-    const animationThreshold = 800;
     const complete = thirdSectionProgress >= animationThreshold;
-    setAnimationComplete(complete); // для стора
-    setIsAnimationCompleteState(complete); // для локального UI
+    setAnimationComplete(complete);
+    setIsAnimationCompleteState(complete);
 
-    if (thirdSectionProgress >= animationThreshold) {
-      console.log('ThirdScreen: List highlight complete');
-      setAnimationComplete(true);
-    } else {
-      setAnimationComplete(false);
-    }
+    console.log('ThirdScreen: Animation state', {
+      thirdSectionProgress,
+      isAnimationComplete: complete,
+      animationThreshold,
+    });
   }, [thirdSectionProgress, isSectionReady, setAnimationComplete]);
 
-  // Анимация списка начинается после thirdSectionProgress >= 100
-  // Настрой это значение (100), чтобы анимация начиналась раньше/позже
-  const listAnimationStart = 900;
-  const activeIndex =
-    thirdSectionProgress >= listAnimationStart
-      ? Math.min(
-          Math.floor(
-            (thirdSectionProgress - listAnimationStart) / 175,
-          ),
-          3,
-        )
-      : -1; // -1 означает, что ни один пункт не активен (все серые)
+  useEffect(() => {
+    if (thirdSectionProgress >= animationStart) {
+      const newIndex = Math.min(
+        Math.floor((thirdSectionProgress - animationStart) / 300),
+        features.length - 1,
+      );
+      setActiveIndex(newIndex);
+      setTextIndex(newIndex); // Синхронное обновление textIndex
+    } else {
+      setActiveIndex(0);
+      setTextIndex(0);
+    }
+  }, [thirdSectionProgress]);
 
   const screenshots = [
     '/screenshots/screen2.jpg',
@@ -95,84 +100,100 @@ const ThirdScreen = () => {
     },
   ];
 
-  // Логирование для отладки
   useEffect(() => {
     console.log('ThirdScreen State:', {
       thirdSectionProgress,
       activeIndex,
+      textIndex,
       screenshot:
         activeIndex >= 0 ? screenshots[activeIndex] : 'none',
       isSectionReady,
+      isAnimationComplete,
     });
-  }, [thirdSectionProgress, activeIndex, isSectionReady]);
-
-  console.log(
-    'Wrapper position:',
-    !isAnimationComplete ? 'fixed' : 'relative',
-  );
+  }, [
+    thirdSectionProgress,
+    activeIndex,
+    textIndex,
+    isSectionReady,
+    isAnimationComplete,
+  ]);
 
   return (
     <div
       className={styles.wrapper}
       ref={wrapperRef}
       style={{
-        position: !isAnimationComplete ? 'fixed' : 'relative',
-        top: !isAnimationComplete ? 0 : 'auto',
-        left: !isAnimationComplete ? 0 : 'auto',
+        position: 'relative',
+        width: '100%',
+        height: '100vh',
+        zIndex: 2,
       }}
     >
-      <h1 className={styles.title}>Staffly key features</h1>
       <div className={styles.container}>
-        <div className={styles.textWrapper}>
-          <ul className={styles.featureList}>
-            {features.map((feature, index) => (
-              <li
-                key={index}
-                className={`${styles.featureItem} ${
-                  activeIndex === index ? styles.active : ''
-                }`}
-              >
-                <h3 className={styles.featureTitle}>
-                  {feature.title}
-                </h3>
-                <p className={styles.featureText}>{feature.text}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <h1 className={styles.title}>Staffly key features</h1>
         <div className={styles.canvasWrapper}>
           <Canvas
-            camera={{ position: [3, 2, 6], fov: 50 }}
+            camera={{ position: [4, 2, 6], fov: 50 }}
             style={{
-              height: '100%',
+              height: '100vh',
               width: '100%',
             }}
           >
-            <ambientLight intensity={1.5} />
-            <pointLight position={[10, 10, 10]} intensity={0.8} />
-            <pointLight position={[-10, 10, -10]} intensity={0.8} />
-            <pointLight position={[0, -10, 0]} intensity={0.6} />
+            <ambientLight intensity={2} />
+            <pointLight position={[10, 10, 10]} intensity={1} />
+            <pointLight position={[-10, 10, -10]} intensity={1} />
+            <pointLight position={[0, -10, 0]} intensity={1} />
             <directionalLight
               position={[0, 15, 5]}
-              intensity={1.5}
+              intensity={2}
               castShadow
-              shadow-mapSize-width={1024}
-              shadow-mapSize-height={1024}
             />
             <IPhone
-              // Показываем скриншот только если есть активный пункт
               screenshot={
                 activeIndex >= 0
                   ? screenshots[activeIndex]
                   : screenshots[0]
               }
-              position={[0.5, 0, 0]}
-              rotation={[-0.3, -Math.PI / 0.9, 0.1]}
-              scale={0.74}
+              position={[-1.2, -1.3, 0.8]}
+              rotation={[-0.2, -Math.PI / 1, -0.1]}
+              scale={1}
+              velocity={[0.1, 0.05, 0]}
+              rotationSpeed={[0.01, 0.02, 0]}
+            />
+            <Pixel
+              screenshot={
+                activeIndex >= 0
+                  ? screenshots[activeIndex]
+                  : screenshots[0]
+              }
+              position={[-0.2, -0.1, -4]}
+              rotation={[1.2, -Math.PI / 1.07, 1]}
+              scale={3.5}
               velocity={[0.1, 0.05, 0]}
               rotationSpeed={[0.01, 0.02, 0]}
             />
           </Canvas>
+        </div>
+
+        <div className={styles.sliderWrapper}>
+          <div className={styles.featureContainer}>
+            {features.map((feature, index) => (
+              <div
+                key={index}
+                className={`${styles.featureItem} ${
+                  textIndex === index ? styles.active : ''
+                }`}
+                style={{
+                  display: textIndex === index ? 'flex' : 'none', // Показываем только активный элемент
+                }}
+              >
+                <h3 className={styles.featureTitle}>
+                  {feature.title}
+                </h3>
+                <p className={styles.featureText}>{feature.text}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
